@@ -83,6 +83,7 @@
       <h1>ภาพรวมผู้ลงทะเบียน</h1>
     </div>
     <div class="actions">
+      <a class="btn" href="checkin.html" style="text-decoration:none;display:inline-flex;align-items:center;">หน้าสแกนเช็คอิน</a>
       <button class="btn" id="refreshBtn">รีเฟรชข้อมูล</button>
       <button class="btn primary" id="exportBtn">ส่งออก CSV</button>
     </div>
@@ -90,9 +91,9 @@
 
   <div class="stat-grid">
     <div class="stat-card"><div class="label">ผู้ลงทะเบียนทั้งหมด</div><div class="value mono" id="statTotal">–</div></div>
+    <div class="stat-card"><div class="label">เช็คอินแล้ว</div><div class="value mono" id="statCheckedIn">–</div></div>
     <div class="stat-card"><div class="label">สาขายอดนิยม</div><div class="value" style="font-size:16px;font-family:'Kanit',sans-serif;" id="statTop">–</div></div>
     <div class="stat-card"><div class="label">โรงเรียนที่เข้าร่วม</div><div class="value mono" id="statSchools">–</div></div>
-    <div class="stat-card"><div class="label">ยังไม่สนใจสาขาใด</div><div class="value mono" id="statNone">–</div></div>
   </div>
 
   <div class="panel-grid">
@@ -120,7 +121,7 @@
       <table id="dataTable">
         <thead>
           <tr>
-            <th>เวลา</th><th>ชื่อ-นามสกุล</th><th>เพศ</th><th>อายุ</th><th>ระดับชั้น</th><th>โรงเรียน</th><th>เบอร์โทร</th><th>Line ID</th><th>สาขาที่สนใจ</th>
+            <th>เวลา</th><th>ชื่อ-นามสกุล</th><th>เพศ</th><th>อายุ</th><th>ระดับชั้น</th><th>โรงเรียน</th><th>เบอร์โทร</th><th>อีเมล</th><th>สาขาที่สนใจ</th><th>เช็คอิน</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -132,7 +133,7 @@
 
 <script>
   // TODO: วาง URL ของ Google Apps Script Web App ที่ deploy แล้ว (ตัวเดียวกับหน้า index.html)
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLPnZz0tDCOzdpd8e5pCG7zXDi6ZUCSUirKG6SgAI9A64gf94xVHc72AVEODASdBdr3w/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/XXXXXXXXXXXXXXXXXXXXXXXX/exec";
 
   const MAJOR_COLORS = {
     'เทคโนโลยีธุรกิจดิจิทัล': '#6C5CE7',
@@ -202,6 +203,9 @@
     const schools = new Set(allRows.map(r => r['โรงเรียน']).filter(Boolean));
     document.getElementById('statSchools').textContent = schools.size;
 
+    const checkedIn = allRows.filter(r => r['เช็คอิน'] === 'เช็คอินแล้ว').length;
+    document.getElementById('statCheckedIn').textContent = checkedIn + ' / ' + allRows.length;
+
     const counts = {};
     allRows.forEach(r => {
       const m = r['สาขาที่สนใจ'] || 'ไม่ระบุ';
@@ -209,7 +213,6 @@
     });
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
     document.getElementById('statTop').textContent = sorted[0] ? sorted[0][0] : '–';
-    document.getElementById('statNone').textContent = counts['ไม่สนใจ'] || 0;
   }
 
   function renderMajorChart() {
@@ -269,6 +272,7 @@
     rows.slice().reverse().forEach(r => {
       const tr = document.createElement('tr');
       const time = r['Timestamp'] ? new Date(r['Timestamp']).toLocaleString('th-TH') : '';
+      const checked = r['เช็คอิน'] === 'เช็คอินแล้ว';
       tr.innerHTML = `
         <td>${time}</td>
         <td>${r['คำนำหน้า'] || ''} ${r['ชื่อ'] || ''} ${r['นามสกุล'] || ''}</td>
@@ -277,8 +281,9 @@
         <td>${r['ระดับชั้น'] || ''}</td>
         <td>${r['โรงเรียน'] || ''}</td>
         <td>${r['เบอร์โทร'] || ''}</td>
-        <td>${r['LineID'] || ''}</td>
-        <td>${r['สาขาที่สนใจ'] || ''}</td>`;
+        <td>${r['อีเมล'] || ''}</td>
+        <td>${r['สาขาที่สนใจ'] || ''}</td>
+        <td style="color:${checked ? '#1E7B3B' : '#9AA0C4'};font-weight:600;">${checked ? '✓ เช็คอินแล้ว' : '—'}</td>`;
       tbody.appendChild(tr);
     });
   }
