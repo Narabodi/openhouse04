@@ -219,6 +219,12 @@
               <input type="text" name="lineId" placeholder="ไม่บังคับ">
             </div>
           </div>
+          <div class="row">
+            <div>
+              <label>อีเมล <span class="req">*</span></label>
+              <input type="text" name="email" required inputmode="email" placeholder="ใช้สำหรับส่ง QR Code เช็คอินหน้างาน">
+            </div>
+          </div>
         </fieldset>
 
         <fieldset>
@@ -249,7 +255,7 @@
 
 <script>
   // TODO: วาง URL ของ Google Apps Script Web App ที่ deploy แล้ว
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLPnZz0tDCOzdpd8e5pCG7zXDi6ZUCSUirKG6SgAI9A64gf94xVHc72AVEODASdBdr3w/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/XXXXXXXXXXXXXXXXXXXXXXXX/exec";
 
   // --- signature branch highlight ---
   const svg = document.getElementById('branchSvg');
@@ -283,6 +289,7 @@
       schoolName: fd.get('schoolName'),
       phone: fd.get('phone'),
       lineId: fd.get('lineId') || '',
+      email: fd.get('email'),
       interestedMajor: fd.get('interestedMajor'),
       consent: consent
     };
@@ -306,7 +313,7 @@
       const result = await res.json();
 
       if (result.success) {
-        msg.textContent = 'ลงทะเบียนสำเร็จ ขอบคุณที่เข้าร่วมงานนะครับ/คะ 🎉';
+        msg.textContent = 'ลงทะเบียนสำเร็จ 🎉 กรุณาตรวจสอบอีเมลของคุณ (รวมโฟลเดอร์ Junk/Spam ด้วย) เพื่อรับ QR Code สำหรับเช็คอินหน้างาน';
         msg.classList.add('show', 'ok');
         form.reset();
         svg.querySelectorAll('[data-major]').forEach(el => {
